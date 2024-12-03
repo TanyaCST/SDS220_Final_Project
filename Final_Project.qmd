@@ -1,0 +1,58 @@
+---
+title: "Final Project"
+author: "Tanya Chen, Allison Bleicher"
+format: pdf:
+    geometry: 
+      - left=1in
+      - right=1in
+      - top=1in
+      - bottom=1in
+---
+
+## Introduction
+
+## Exploratory Analysis
+
+## Result
+
+To investigate whether the initial total price (the sum of starting price and shipping price) equals to the dealing price, we need to conduct a two sample mean T test. In words, the null hypothesis for the hypothesis testing is that there is no difference between the initial total price and the dealing price.  The alternative hypothesis is that there is a difference between the initial total price and the dealing price of Mario Kart. In symbols: 
+$$H_0: \mu_{diff} = 0$$ 
+$$H_A: \mu_{diff} \ne 0$$
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# Load packages
+suppressWarnings({
+  library(tidyverse)
+  library(openintro)
+})
+
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# Read dataset
+# if you want to read the document in your 
+marioKart <- read_csv('/Users/tanyachen/Documents/sds220/Final Project/mariokart.csv')
+
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# Calculate the total price based on initial starting and shipping price
+initial_total_pr <- marioKart$start_pr + marioKart$ship_pr
+
+# Summarize the initial total price and final total price into a table
+
+
+# Calculate the difference between initial total price and final total price and add it into the dataframe
+
+```
+
+The type of test being used is clear.
+Assumptions are investigated.
+The hypothesis test has a clear connection to the research question.
+The test statistic, p-value, degrees of freedom, confidence interval, and significance level are explained/provided. (Only some of these will be applicable for each project)
+For confidence intervals: corresponding interpretations are provided.
+For linear regression models: coefficients are interpreted.
+Explain any statistics or figures used for the hypothesis test.
+Results are interpreted correctly and in context. 
+
+## Discussion
