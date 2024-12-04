@@ -1,7 +1,8 @@
 ---
 title: "Final Project"
 author: "Tanya Chen, Allison Bleicher"
-format: pdf:
+format: 
+  pdf:
     geometry: 
       - left=1in
       - right=1in
@@ -13,25 +14,21 @@ format: pdf:
 
 ## Exploratory Analysis
 
-## Result
-
-To investigate whether the initial total price (the sum of starting price and shipping price) equals to the dealing price, we need to conduct a two sample mean T test. In words, the null hypothesis for the hypothesis testing is that there is no difference between the initial total price and the dealing price.  The alternative hypothesis is that there is a difference between the initial total price and the dealing price of Mario Kart. In symbols: 
-$$H_0: \mu_{diff} = 0$$ 
-$$H_A: \mu_{diff} \ne 0$$
-
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # Load packages
 suppressWarnings({
   library(tidyverse)
   library(openintro)
+  library(googlesheets4)
+  
 })
 
 ```
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# Read dataset
-# if you want to read the document in your 
-marioKart <- read_csv('/Users/tanyachen/Documents/sds220/Final Project/mariokart.csv')
+# Importing dataset
+# Read the document from google spreadsheet Mario Kart
+marioKart <- read_sheet('https://docs.google.com/spreadsheets/d/1jhiTFaaJ4ZCUA9yMNFGQ2xnKItXewaNmzu6y0Syw_dk/edit?gid=1751719576#gid=1751719576')
 
 ```
 
@@ -39,20 +36,90 @@ marioKart <- read_csv('/Users/tanyachen/Documents/sds220/Final Project/mariokart
 # Calculate the total price based on initial starting and shipping price
 initial_total_pr <- marioKart$start_pr + marioKart$ship_pr
 
+dealing_pr <- marioKart$total_pr
+
 # Summarize the initial total price and final total price into a table
-
-
-# Calculate the difference between initial total price and final total price and add it into the dataframe
+price_Table <- data_frame(initial_total_pr, dealing_pr)
+glimpse(price_Table)
 
 ```
 
-The type of test being used is clear.
-Assumptions are investigated.
-The hypothesis test has a clear connection to the research question.
-The test statistic, p-value, degrees of freedom, confidence interval, and significance level are explained/provided. (Only some of these will be applicable for each project)
-For confidence intervals: corresponding interpretations are provided.
-For linear regression models: coefficients are interpreted.
-Explain any statistics or figures used for the hypothesis test.
-Results are interpreted correctly and in context. 
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# Calculate the difference between initial total price and final total price and add it into the dataframe
+price_Difference <- marioKart$total_pr - initial_total_pr
+
+price_Table <- data_frame(initial_total_pr, dealing_pr, price_Difference)
+
+```
+
+## Result
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# Grading Rule Breaks for Results
+
+# The type of test being used is clear.
+# Assumptions are investigated.
+# The hypothesis test has a clear connection to the research question.
+# The test statistic, p-value, degrees of freedom, confidence interval, and significance level are explained/provided. (Only some of these will be applicable for each project)
+# For confidence intervals: corresponding interpretations are provided.
+# For linear regression models: coefficients are interpreted.
+# Explain any statistics or figures used for the hypothesis test.
+# Results are interpreted correctly and in context. 
+
+```
+
+
+To investigate whether the initial total price (the sum of starting price and shipping price) equals to the dealing price, we need to conduct a two sample mean T test. Before starting hypothesis testing, we need to bring out null hypothesis and alternative hypothesis of our research question. Our null hypothesis for the hypothesis testing is that there is no difference between the initial total price and the dealing price. Our alternative hypothesis is that there is a difference between the initial total price and the dealing price of Mario Kart. In symbols: 
+$$H_0: \mu_{diff} = 0$$ 
+$$H_A: \mu_{diff} \ne 0$$
+To investigate whether our null hypothesis is true, we need to conduct a **Two Sample T Test**. A two sample T test is 
+
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# Calculate Test Statistics
+# Reinforce which hypothesis testing method we will use to investigate our research problem
+# Explaining what is test statistics and how does it matter
+# Show the mathematical formula of calculating test statistics
+# Calculate test statistics using RStudio
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# Calculate the degrees of freedom
+# Explaining what is the definition of degrees of freedom
+# Showing the formula of degrees of freedom
+# Calculate degrees of freedom
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# This code chunk will include calculation of p-value
+# Defining the significance level
+# Calculate p-value
+# Create a histogram
+# Explaining the p-value
+# Provide a conclusion
+
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# This code chunk will include calculation of confidence interval
+# Defining and explaining confidence interval
+# Providing mathematical formula for calculating confidence interval
+# Calculate confidence interval
+# Explain confidence interval and provide a conclusion
+
+```
 
 ## Discussion
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# Grading Rubric for discussion
+
+# A summary of your overall findings are explained in a clear and straightforward manner such that a person without statistical training or domain expertise can understand them.
+# Results are tied back to the research question.
+# Limitations of the analysis/data are acknowledged.
+# It is explained/assessed if the sample is representative of your population of interest. (Hint: Most samples have some limitations. It is okay to have a sample that is not perfect, but you must be able to identify why the sample may not represent the population.)
+# Discussion of future directions or extensions to this project you want to consider.
+
+```
+
+
