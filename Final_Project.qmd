@@ -69,10 +69,31 @@ price_Table <- data_frame(initial_total_pr, dealing_pr, price_Difference)
 ```
 
 
-To investigate whether the initial total price (the sum of starting price and shipping price) equals to the dealing price, we need to conduct a two sample mean T test. Before starting hypothesis testing, we need to bring out null hypothesis and alternative hypothesis of our research question. Our null hypothesis for the hypothesis testing is that there is no difference between the initial total price and the dealing price. Our alternative hypothesis is that there is a difference between the initial total price and the dealing price of Mario Kart. In symbols: 
+To investigate whether the average initial total price (the sum of starting price and shipping price) equals to the average dealing price, we need to conduct a two sample mean T test. 
+
+#### Hypotheses
+Before starting hypothesis testing, we need to bring out null hypothesis and alternative hypothesis of our research question. Our null hypothesis for the hypothesis testing is that there is no difference between the mean initial total price and the mean dealing price. Our alternative hypothesis is that there is a difference between the mean initial total price and the mean dealing price of Mario Kart. In symbols: 
 $$H_0: \mu_{diff} = 0$$ 
 $$H_A: \mu_{diff} \ne 0$$
-To investigate whether our null hypothesis is true, we need to conduct a **Two Sample T Test**. A two sample T test is 
+To investigate whether our null hypothesis is true, we need to conduct a **Two Sample T Test**. Before conducting the hypothesis testing, we need to check the conditions: **independence** and **normality condition**.
+
+#### Checking Conditions
+Since the `mariokart` dataset is collected, it is a simple random sample, and we can assume that each pair of the initial total price and the dealing price are independent. While there are some outliers, $n$ = 143 and none of the outliers are particularly extreme, so the normality condition is satisfied.
+With these conditions satisfied, we can move forward with the t-distribution.
+
+#### Calculating T Statistics
+Using two means t test, we will compute the T-score, which means the ratio of how the sample mean difference varies from zero as compared to how the observations vary. We compute T statistics using the formula below:
+$$T = \frac{\bar{x}_{paired}}{\sqrt{\frac{S^2_{paired}}{n}}}$$
+```{r}
+# Calculate the mean difference of initial price and the dealing price of Mario Kart
+x_bar_paired = mean(price_Difference)
+
+```
+
+```{r}
+# Calculate S_paired
+
+```
 
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
