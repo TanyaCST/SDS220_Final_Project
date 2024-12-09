@@ -75,42 +75,62 @@ To investigate whether the average initial total price (the sum of starting pric
 Before starting hypothesis testing, we need to bring out null hypothesis and alternative hypothesis of our research question. Our null hypothesis for the hypothesis testing is that there is no difference between the mean initial total price and the mean dealing price. Our alternative hypothesis is that there is a difference between the mean initial total price and the mean dealing price of Mario Kart. In symbols: 
 $$H_0: \mu_{diff} = 0$$ 
 $$H_A: \mu_{diff} \ne 0$$
-To investigate whether our null hypothesis is true, we need to conduct a **Two Sample T Test**. Before conducting the hypothesis testing, we need to check the conditions: **independence** and **normality condition**.
+To investigate whether our null hypothesis is true, we need to conduct a **T Test for paired means**. 
 
 #### Checking Conditions
-Since the `mariokart` dataset is collected, it is a simple random sample, and we can assume that each pair of the initial total price and the dealing price are independent. While there are some outliers, $n$ = 143 and none of the outliers are particularly extreme, so the normality condition is satisfied.
-With these conditions satisfied, we can move forward with the t-distribution.
+Before conducting the hypothesis testing, we need to check the conditions: **independence** and **normality**. 
 
-#### Calculating T Statistics
-Using two means t test, we will compute the T-score, which means the ratio of how the sample mean difference varies from zero as compared to how the observations vary. We compute T statistics using the formula below:
-$$T = \frac{\bar{x}_{paired}}{\sqrt{\frac{S^2_{paired}}{n}}}$$
-```{r}
-# Calculate the mean difference of initial price and the dealing price of Mario Kart
-x_bar_paired = mean(price_Difference)
+##### Independence
+Independence checks whether the data within the groups are independent. Since the `mariokart` dataset is collected, it is a simple random sample, and we can assume that each pair of the initial total price and the dealing price are independent. 
 
+##### Normality
+Normality checks whether the difference of the paired data is roughly symmetric without large outliers.
+```{r,echo = FALSE, message = FALSE, warning = FALSE}
+price_Table|>
+  ggplot(aes(x = price_Difference)) +
+  geom_boxplot() +
+  theme_bw()
+  
 ```
+Based on the boxplot above, the distribution of the difference of initial total price and dealing price are roughly normal with three outliers. There is an outlier that significantly differs from the distribution.
 
-```{r}
-# Calculate S_paired
+#### Calculation
+Using t test for paired means, we will compute T-Statistics, degrees of freedom, p-value, and confidence interval with a significance level $\alpha = 0.05$.
 
-```
-
+##### R Code Overview
+In RStudio, we can use `t.test(initial_total_pr,dealing_pr, paired = TRUE, alternative = "two.sided")` to calculate t statistics, degrees of freedom, p-value, and confidence interval of the difference between the initial and dealing price of Mario Kart game on EBay:
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# Calculate Test Statistics
-# Reinforce which hypothesis testing method we will use to investigate our research problem
-# Explaining what is test statistics and how does it matter
-# Show the mathematical formula of calculating test statistics
 # Calculate test statistics using RStudio
+t_test_pr_diff <-t.test(initial_total_pr,dealing_pr, paired = TRUE, alternative = "two.sided")
+t_test_pr_diff
 ```
 
+Aside from R code, we also can compute T-statistics, degrees of freedom, p-value, and confidence interval based on their mathematical formulas.
+
+##### T-Statistics
+T statistics means the ratio of how the sample mean difference varies from zero as compared to how the observations vary. We compute T statistics using the formula below:
+$$T = \frac{\bar{x}_{paired}}{\sqrt{\frac{S^2_{paired}}{n}}}$$
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+x_bar_paired <- mean(initial_total_pr) - mean(dealing_pr)
+s_paired <- sd(price_Difference)
+n <- 143
+t_statistics <- x_bar_paired/sqrt(s_paired*s_paired/n)
+summary_table <- data_frame(n, x_bar_paired, s_paired, t_statistics)
+summary_table
+
+```
+Since $n = 143$, $\bar{x}_{paired} = -37.9596$, and $S_{paired} = 27.4549$, the T-statistics equals to:
+$$T = \frac{\bar{x}_{paired}}{\sqrt{\frac{S^2_{paired}}{n}}} = \frac{-37.9596}{\sqrt{\frac{27.4549^2}{143}}} = -16.534$$
+##### Degrees of Freedom
+The degrees of freedom, meaning that, equals to $df = n-1 = 143-1 = 142$
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # Calculate the degrees of freedom
-# Explaining what is the definition of degrees of freedom
-# Showing the formula of degrees of freedom
-# Calculate degrees of freedom
+df <- 143-1
 ```
 
+##### P-Value
+After calculating the t statistics and degrees of freedom, we can calculate p-value using R code `2*pt(t_statistics,df,lower.tail = TRUE)`. Since our alternative hypothesis is $H_A: \mu_{diff} \ne 0$, our p-value is two-tailed.
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # This code chunk will include calculation of p-value
 # Defining the significance level
@@ -118,9 +138,13 @@ x_bar_paired = mean(price_Difference)
 # Create a histogram
 # Explaining the p-value
 # Provide a conclusion
+p_value <- 2*pt(t_statistics, df, lower.tail = TRUE)
 
 ```
+Based on R code, the p-value equals to $6.584 *10^{-35}$. Since our p-value is very small and approximately equals to zero, our p-value is smaller than the significance level $\alpha = 0.05$. Therefore, there is a strong evidence to reject the null hypothesis that there is no difference between the mean initial total price and the mean dealing price of Mario Kart in EBay.
 
+##### Confidence Interval
+Confidence interval is 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # This code chunk will include calculation of confidence interval
 # Defining and explaining confidence interval
