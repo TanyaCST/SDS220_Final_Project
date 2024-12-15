@@ -1,5 +1,5 @@
 ---
-title: "Final Project"
+title: "Price difference between the initial price and auction price of Nintendo Wii Mario Kart"
 author: "Tanya Chen, Allison Bleicher"
 format: 
   pdf:
@@ -11,8 +11,12 @@ format:
 ---
 
 ## Introduction
+Have you ever played Mario Cart on a Nintendo Wii? Many children in the US played it growing up. While you can still buy the game today, older versions are only available on second sale sites, like Ebay. Ebay is interesting because you can sell things through an online auction. You set the start price, but others can bid higher prices to get the item. In this data analysis, we look into the correlation between the start price, shipping price, and total price of Mario Cart games sold on Ebay. The data set used took all the auctions of Mario Cart games that happened during one week in October 2009 [@mario]. Through this data analysis, we are able to see the correlation of the prices for Mario Cart games, but we can also apply these findings to other things for auction on Ebay to help people make decisions about what they are going to pay. 
 
 ## Exploratory Analysis
+
+#### Dataset
+The data was collected from Ebay and includes all auctions for a full week in early October of 2009. Auctions were only included if they fufilled certain requirements. The auctions were in a search for "wii mario cart" on ebay.com; items were under the Video Games -> Games -> Nintendo Wii section of Ebay; the listing was an auction and not only a "Buy It Now" listing; the item listed was the actual Mario Cart game; the item was being sold from the United States; the item had at least one bidder; there were no other items included in the auction listing (except for racing wheels); and the auction did not end with a "Buy It Now" option. 
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # Load packages
@@ -20,10 +24,90 @@ suppressWarnings({
   library(tidyverse)
   library(openintro)
   library(googlesheets4)
+  library(knitr)
+  library(ggplot2)
   
 })
 
 ```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+mario_data <- read_csv("https://www.openintro.org/data/csv/mariokart.csv")
+mario_data2 <- mario_data |>
+  select(start_pr , ship_pr , total_pr)
+```
+
+There is code that creates a new table from the data that only includes the variables that we will be looking at and analyzing. The original data set includes 12 variables and 143 observations, but we only look at 3 specific variables. The variables studied are the start_pr (starting price of the auction in USD), ship_pr (shipping price of the item in USD), and total_pr (total price of the item in USD). 
+
+#### Distribution of Variables
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+#| label: fig-startpr
+#| fig-cap: "Distribution of the Start Prices"
+#| echo: false
+ggplot(
+  data = mario_data2, 
+  mapping = aes(x = start_pr))+ 
+  geom_boxplot()+
+  labs(x = "Start Price")
+```
+@fig-startpr is a boxplot that shows the distribution of the start prices. The mean start price is $8.78.
+
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+#| label: fig-shippr
+#| fig-cap: "Distribution of the Ship Prices"
+#| echo: false
+ggplot(
+  data = mario_data2, 
+  mapping = aes(x = ship_pr))+ 
+  geom_boxplot() +
+  labs(x = "Ship Price")
+```
+@fig-shippr is a boxplot showing the distribution of the shipping prices. The mean shipping price is $3.14.
+
+ 
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+#| label: fig-totalpr
+#| fig-cap: "Distribution of the Total Prices"
+#| echo: false
+ggplot(
+  data = mario_data2, 
+  mapping = aes(x = total_pr))+ 
+  geom_boxplot() +
+  labs(x = "Total Price")
+```
+@fig-totalpr is a boxplot that shows the distribution of the total prices. The mean total price is $49.88. 
+
+#### Relationships Between Variables
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+#| label: fig-start-and-totalpr
+#| fig-cap: "Relationship Between Start Price and Total Price"
+#| echo: false
+ggplot(data = mario_data2, aes(x = start_pr, y = total_pr)) + 
+  geom_point(color='blue') +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x = "Start Price",
+       y = "Total Price")
+```
+@fig-start-and-totalpr is a scatter plot of the relationship between the start price and the total price. The line of best fit shows a slightly positive relationship between the two variables.
+
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+#| label: fig-ship-and-totalpr
+#| fig-cap: "Relationship Between Ship Price and Total Price"
+#| echo: false
+ggplot(data = mario_data2, aes(x = ship_pr, y = total_pr)) + 
+  geom_point(color='blue') +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x = "Ship Price",
+       y = "Total Price")
+```
+@fig-ship-and-totalpr is a scatter plot of the relationship between the shipping price and total price. The line of best fit shows a moderate positive relationship between the two variables. 
+
+## Result
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # Importing dataset
@@ -40,7 +124,6 @@ dealing_pr <- marioKart$total_pr
 
 # Summarize the initial total price and final total price into a table
 price_Table <- data_frame(initial_total_pr, dealing_pr)
-glimpse(price_Table)
 
 ```
 
@@ -52,109 +135,70 @@ price_Table <- data_frame(initial_total_pr, dealing_pr, price_Difference)
 
 ```
 
-## Result
+### Hypotheses
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# Grading Rule Breaks for Results
+Before starting hypothesis testing, we need to bring out null hypothesis and alternative hypothesis of our research question. Our null hypothesis is that there is no difference between the mean initial total price and the mean dealing price for game Mario Kart on EBay. Our alternative hypothesis is that there is a difference between the mean initial total price and the mean dealing price of Mario Kart on EBay. In symbols: $$H_0: \mu_{diff} = 0$$ $$H_A: \mu_{diff} \ne 0$$ Our goal is to use hypothesis testing to reject our null hypothesis. To investigate whether our null hypothesis is false, we need to conduct a **Paired T-Test**.
 
-# The type of test being used is clear.
-# Assumptions are investigated.
-# The hypothesis test has a clear connection to the research question.
-# The test statistic, p-value, degrees of freedom, confidence interval, and significance level are explained/provided. (Only some of these will be applicable for each project)
-# For confidence intervals: corresponding interpretations are provided.
-# For linear regression models: coefficients are interpreted.
-# Explain any statistics or figures used for the hypothesis test.
-# Results are interpreted correctly and in context. 
+### Checking Conditions
 
-```
+Before conducting the hypothesis testing, we need to check two conditions: **independence** and **normality**.
 
+Independence checks whether the data within the groups are independent. Since the `mariokart` dataset is collected, it is a simple random sample, and we can assume that each pair of the initial total price and the dealing price are independent.
 
-To investigate whether the average initial total price (the sum of starting price and shipping price) equals to the average dealing price, we need to conduct a two sample mean T test. 
-
-#### Hypotheses
-Before starting hypothesis testing, we need to bring out null hypothesis and alternative hypothesis of our research question. Our null hypothesis for the hypothesis testing is that there is no difference between the mean initial total price and the mean dealing price. Our alternative hypothesis is that there is a difference between the mean initial total price and the mean dealing price of Mario Kart. In symbols: 
-$$H_0: \mu_{diff} = 0$$ 
-$$H_A: \mu_{diff} \ne 0$$
-To investigate whether our null hypothesis is true, we need to conduct a **T Test for paired means**. 
-
-#### Checking Conditions
-Before conducting the hypothesis testing, we need to check the conditions: **independence** and **normality**. 
-
-##### Independence
-Independence checks whether the data within the groups are independent. Since the `mariokart` dataset is collected, it is a simple random sample, and we can assume that each pair of the initial total price and the dealing price are independent. 
-
-##### Normality
 Normality checks whether the difference of the paired data is roughly symmetric without large outliers.
+
 ```{r,echo = FALSE, message = FALSE, warning = FALSE}
+#| label: fig-distribution_price_difference
+#| fig-cap: "Distribution of price difference between initial and dealing price of Mario Kart on EBay"
 price_Table|>
   ggplot(aes(x = price_Difference)) +
   geom_boxplot() +
+  labs(x = "Price Difference") +
   theme_bw()
   
 ```
-Based on the boxplot above, the distribution of the difference of initial total price and dealing price are roughly normal with three outliers. There is an outlier that significantly differs from the distribution.
 
-#### Calculation
-Using t test for paired means, we will compute T-Statistics, degrees of freedom, p-value, and confidence interval with a significance level $\alpha = 0.05$.
+@fig-distribution_price_difference is a boxplot representing the distribution of the price difference of game Mario Kart on EBay in 2009. Based on the boxplot above, the distribution of the difference of initial total price and dealing price are roughly normal with three outliers. There is no outlier that significantly differs from the distribution and therefore satisfies the condition.
 
-##### R Code Overview
-In RStudio, we can use `t.test(initial_total_pr,dealing_pr, paired = TRUE, alternative = "two.sided")` to calculate t statistics, degrees of freedom, p-value, and confidence interval of the difference between the initial and dealing price of Mario Kart game on EBay:
+### Calculation
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# Calculate test statistics using RStudio
-t_test_pr_diff <-t.test(initial_total_pr,dealing_pr, paired = TRUE, alternative = "two.sided")
-t_test_pr_diff
-```
+Using t test for paired means, we will compute T-Statistics, degrees of freedom, p-value, and confidence interval with a significance level $\alpha = 0.05$. The significance level means that
 
-Aside from R code, we also can compute T-statistics, degrees of freedom, p-value, and confidence interval based on their mathematical formulas.
+**T statistics** stands for the ratio of how the sample mean difference varies from zero as compared to how the observations vary. The T test statistics obtained from formula $$T = \frac{\bar{x}_{paired}}{\sqrt{\frac{S^2_{paired}}{n}}}$$ is -16.354. The large absolute value of t test statistics means that if our null hypothesis that there is no difference between the initial total price and the dealing price for Wii Mario Kart on EBay is true, the result is relatively largely deviated from what we expect based on our null hypothesis.
 
-##### T-Statistics
-T statistics means the ratio of how the sample mean difference varies from zero as compared to how the observations vary. We compute T statistics using the formula below:
-$$T = \frac{\bar{x}_{paired}}{\sqrt{\frac{S^2_{paired}}{n}}}$$
+**The degrees of freedom** is used to describe the shape of t-distribution. Its formula is $df = n -1$.In this case, the degrees of freedom is 142. The large degrees of freedom means that the t-distribution is closer to normal distribution.
+
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 x_bar_paired <- mean(initial_total_pr) - mean(dealing_pr)
 s_paired <- sd(price_Difference)
 n <- 143
 t_statistics <- x_bar_paired/sqrt(s_paired*s_paired/n)
 summary_table <- data_frame(n, x_bar_paired, s_paired, t_statistics)
-summary_table
 
 ```
-Since $n = 143$, $\bar{x}_{paired} = -37.9596$, and $S_{paired} = 27.4549$, the T-statistics equals to:
-$$T = \frac{\bar{x}_{paired}}{\sqrt{\frac{S^2_{paired}}{n}}} = \frac{-37.9596}{\sqrt{\frac{27.4549^2}{143}}} = -16.534$$
-##### Degrees of Freedom
-The degrees of freedom, meaning that, equals to $df = n-1 = 143-1 = 142$
+
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # Calculate the degrees of freedom
 df <- 143-1
 ```
 
-##### P-Value
-After calculating the t statistics and degrees of freedom, we can calculate p-value using R code `2*pt(t_statistics,df,lower.tail = TRUE)`. Since our alternative hypothesis is $H_A: \mu_{diff} \ne 0$, our p-value is two-tailed.
+After calculating the t statistics and degrees of freedom, we can calculate **p-value**. P-value is the probability that views the alternative hypothesis for the data least agreeable if the null hypothesis is true. Since our alternative hypothesis is $H_A: \mu_{diff} \ne 0$, our p-value is two-tailed. Based on R code `t.test(initial_total_pr,dealing_pr, paired = TRUE, alternative = "two.sided")`, the p-value is to $2.2*10^{-16}$. Since our p-value is very small and approximately equals to zero, our p-value is smaller than the significance level $\alpha = 0.05$. Therefore, we reject the null hypothesis that there is no difference between the mean initial total price and the mean dealing price of game Mario Kart on EBay on 2009.
+
+To find a range of the true difference between initial price and dealing price, we compute **confidence interval**. Confidence interval is a range of plausible values where we can find true population value. In this case, we are using confidence interval to calculate a range of plausible values of true difference of paired means. $A$ Based on R Code `t.test(initial_total_pr,dealing_pr, paired = TRUE, alternative = "two.sided")`, The 95% confidence interval is $(-42.49814, -33.42102)$. It means that we are 95% confident that true mean difference between initial price and dealing price is in the range $(-42.49814, -33.42102)$. 
+
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# This code chunk will include calculation of p-value
-# Defining the significance level
-# Calculate p-value
-# Create a histogram
-# Explaining the p-value
-# Provide a conclusion
-p_value <- 2*pt(t_statistics, df, lower.tail = TRUE)
-
+invisible(t.test(initial_total_pr,dealing_pr, paired = TRUE, alternative = "two.sided"))
 ```
-Based on R code, the p-value equals to $6.584 *10^{-35}$. Since our p-value is very small and approximately equals to zero, our p-value is smaller than the significance level $\alpha = 0.05$. Therefore, there is a strong evidence to reject the null hypothesis that there is no difference between the mean initial total price and the mean dealing price of Mario Kart in EBay.
 
-##### Confidence Interval
-Confidence interval is 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# This code chunk will include calculation of confidence interval
-# Defining and explaining confidence interval
-# Providing mathematical formula for calculating confidence interval
-# Calculate confidence interval
-# Explain confidence interval and provide a conclusion
-
-```
 
 ## Discussion
+
+This study investigate whether there is a difference between the initial price and the dealing price of game Mario Kart on EBay. Based on the result we gathered, there is a difference between the initial total proce and the dealing price of game Mario Kart on EBay in 2009. The true mean difference between the initial total price and dealing price of Nintendo Wii Mario Kart lies in the range $(-42.49814, -33.42102)$. Based on our result, the dealing price of game Mario Kart is more expensive than its initial total price.  
+There are some limitations in this study. 
+1. We cannot use the data from 2009 to match what is the current second-hand price for Wii Mario kart.
+2. This data is not a simple random sample. The data set used took all the auctions of Mario Cart games that happened during one week in October 2009. This sample is not representative. Different time (discount seasons might make a difference for the dealing price/auction price).
+If we want to investigate more
+1. Gather new data of current second-hand Nintendo Wii Mario Kart price with larger sample size. 
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # Grading Rubric for discussion
@@ -166,5 +210,3 @@ Confidence interval is
 # Discussion of future directions or extensions to this project you want to consider.
 
 ```
-
-
