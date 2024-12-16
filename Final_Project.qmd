@@ -1,5 +1,5 @@
 ---
-title: "Price difference between the initial price and auction price of Nintendo Wii Mario Kart"
+title: "Price difference between the starting total price and the dealing price of Nintendo Wii Mario Kart"
 author: "Tanya Chen, Allison Bleicher"
 format: 
   pdf:
@@ -8,22 +8,21 @@ format:
       - right=1in
       - top=1in
       - bottom=1in
+bibliography: final.bib
 ---
 
 ## Introduction
-Have you ever played Mario Cart on a Nintendo Wii? Many children in the US played it growing up. While you can still buy the game today, older versions are only available on second sale sites, like Ebay. Ebay is interesting because you can sell things through an online auction. You set the start price, but others can bid higher prices to get the item. In this data analysis, we look into the correlation between the start price, shipping price, and total price of Mario Cart games sold on Ebay. The data set used took all the auctions of Mario Cart games that happened during one week in October 2009 [@mario]. Through this data analysis, we are able to see the correlation of the prices for Mario Cart games, but we can also apply these findings to other things for auction on Ebay to help people make decisions about what they are going to pay. 
+Have you ever played Mario Cart on a Nintendo Wii? Many children in the US played it growing up. While you can still buy the game today, older versions are only available on second sale sites, like Ebay. Ebay is interesting because you can sell things through an online auction. You set the start price, but others can bid higher prices to get the item. The data set used took all the auctions of Mario Cart games that happened during one week in October 2009 [@mario]. In this study, we look into the correlation between the start price, shipping price, and total price of Mario Cart games sold on Ebay, and investigate whether the total starting price (the sum of starting price and shipping price collected from our data set) is equivalent to the total auction price (the total price in our data set). Through this study, we are able to see the correlation of the prices for Mario Cart games and apply these findings to other things for auction on Ebay to help people make decisions about what they are going to pay.
 
 ## Exploratory Analysis
-
 #### Dataset
-The data was collected from Ebay and includes all auctions for a full week in early October of 2009. Auctions were only included if they fufilled certain requirements. The auctions were in a search for "wii mario cart" on ebay.com; items were under the Video Games -> Games -> Nintendo Wii section of Ebay; the listing was an auction and not only a "Buy It Now" listing; the item listed was the actual Mario Cart game; the item was being sold from the United States; the item had at least one bidder; there were no other items included in the auction listing (except for racing wheels); and the auction did not end with a "Buy It Now" option. 
+The data was collected from Ebay and includes all auctions for a full week in early October of 2009. Auctions were only included if they fulfilled certain requirements. The auctions were in a search for "wii mario cart" on ebay.com; items were under the Video Games -\> Games -\> Nintendo Wii section of Ebay; the listing was an auction and not only a "Buy It Now" listing; the item listed was the actual Mario Cart game; the item was being sold from the United States; the item had at least one bidder; there were no other items included in the auction listing (except for racing wheels); and the auction did not end with a "Buy It Now" option.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # Load packages
 suppressWarnings({
   library(tidyverse)
   library(openintro)
-  library(googlesheets4)
   library(knitr)
   library(ggplot2)
   
@@ -31,16 +30,50 @@ suppressWarnings({
 
 ```
 
+### Description of Variables
+-   id: Auction ID assigned by Ebay
+-   duration: How long the auction happened, in days
+-   n_bids: Number of bids on the auction
+-   cond: Condition of the game, new or used
+-   start_pr: Start price of the auction
+-   ship_pr: Shipping price
+-   total_pr: Total price, the auction price plus the shipping price
+-   ship_sp: Shipping speed or method (first class, standard, etc)
+-   seller_rate: The seller's rating on Ebay. Calculated by the number of negative ratings subtracted from the number of positive ratings.
+-   stock_photo: Whether or not the auction feature photo was a stock photo
+-   wheels: Number of wheels included in the action. The wheels are pieces of silicon that go over the controller to make the game feel more realistic.
+-   title: The title of the auction
+
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 mario_data <- read_csv("https://www.openintro.org/data/csv/mariokart.csv")
 mario_data2 <- mario_data |>
   select(start_pr , ship_pr , total_pr)
 ```
 
-There is code that creates a new table from the data that only includes the variables that we will be looking at and analyzing. The original data set includes 12 variables and 143 observations, but we only look at 3 specific variables. The variables studied are the start_pr (starting price of the auction in USD), ship_pr (shipping price of the item in USD), and total_pr (total price of the item in USD). 
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+mario_data2 <- mario_data2 |>
+  filter( total_pr < 100)
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# Calculate the total price based on initial starting and shipping price
+total_start_pr <- mario_data2$start_pr + mario_data2$ship_pr
+
+total_auction_pr <- mario_data2$total_pr
+
+# Summarize the initial total price and final total price into a table
+price_Table <- data_frame(total_start_pr, total_auction_pr)
+
+# Calculate the difference between initial total price and final total price and add it into the dataframe
+price_Difference <- mario_data2$total_pr - total_start_pr
+
+price_Table <- data_frame(total_start_pr, total_auction_pr, price_Difference)
+
+```
+
+The original data set includes 12 variables and 143 observations, but we only look at 3 specific variables. The variables studied are the start_pr (starting price of the auction in USD), ship_pr (shipping price of the item in USD), and total_pr (total price of the item in USD). In the hypothesis testing, we are using the sum of the shipping prices and starting prices, summarized as total starting price, total prices, renamed as dealing price, and the difference between total starting price and dealing price, framed as price difference. Total starting price, dealing price, and price difference are summarized in dataset `price_Table`. Furthermore, there are two outliers in the total price variable in the original data set. We decided to delete those two rows of data because these two data collected include price of games and product other than Nintendo Wii Mario Kart. Since our study focuses only on the correlation and difference of starting price, shipping price, total start price, and dealing price of Nintendo Wii Mario Kart, we removed 2 data points from the original data set.
 
 #### Distribution of Variables
-
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 #| label: fig-startpr
 #| fig-cap: "Distribution of the Start Prices"
@@ -50,9 +83,9 @@ ggplot(
   mapping = aes(x = start_pr))+ 
   geom_boxplot()+
   labs(x = "Start Price")
-```
-@fig-startpr is a boxplot that shows the distribution of the start prices. The mean start price is $8.78.
 
+```
+@fig-startpr is a boxplot that shows the distribution of the start prices. The distribution is skewed to the right with 8 outliers. The mean start price is \$8.85.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 #| label: fig-shippr
@@ -62,88 +95,83 @@ ggplot(
   data = mario_data2, 
   mapping = aes(x = ship_pr))+ 
   geom_boxplot() +
-  labs(x = "Ship Price")
-```
-@fig-shippr is a boxplot showing the distribution of the shipping prices. The mean shipping price is $3.14.
+  labs(x = "Shipping Price")
 
- 
+```
+@fig-shippr is a boxplot showing the distribution of the shipping prices. The distribution of shipping price is roughly normal with 2 outliers. The mean shipping price is \$2.98.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+#| label: fig-total_start_pr
+#| fig-cap: "Distribution of the Total Starting Prices"
+ggplot(
+  data = price_Table, 
+  mapping = aes(x = total_start_pr))+ 
+  geom_boxplot() +
+  labs(x = "Total Starting Price")
+
+```
+@fig-total_start_pr is a boxplot showing the distribution of the sum of shipping prices and starting prices. The distribution is skewed to the right and has 12 outliers. The mean total starting price is \$11.82.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 #| label: fig-totalpr
-#| fig-cap: "Distribution of the Total Prices"
+#| fig-cap: "Distribution of Total Auction Price"
 #| echo: false
 ggplot(
-  data = mario_data2, 
-  mapping = aes(x = total_pr))+ 
+  data = price_Table, 
+  mapping = aes(x = total_auction_pr))+ 
   geom_boxplot() +
-  labs(x = "Total Price")
+  labs(x = "Total Auction Price")
+
 ```
-@fig-totalpr is a boxplot that shows the distribution of the total prices. The mean total price is $49.88. 
+@fig-totalpr is a boxplot that shows the distribution of the total auction price. The dirstribution is roughly normal. The mean total auction price is \$47.43.
 
 #### Relationships Between Variables
-
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 #| label: fig-start-and-totalpr
-#| fig-cap: "Relationship Between Start Price and Total Price"
+#| fig-cap: "Relationship Between Starting Price and Total Auction Price"
 #| echo: false
-ggplot(data = mario_data2, aes(x = start_pr, y = total_pr)) + 
+ggplot(data = mario_data2, aes(x = start_pr, y = total_auction_pr)) + 
   geom_point(color='blue') +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(x = "Start Price",
-       y = "Total Price")
+  labs(x = "Starting Price",
+       y = "Total Auction Price")
 ```
-@fig-start-and-totalpr is a scatter plot of the relationship between the start price and the total price. The line of best fit shows a slightly positive relationship between the two variables.
-
+@fig-start-and-totalpr is a scatter plot of the relationship between the start price and the total auction price. The line of best fit shows a slightly positive relationship between the two variables.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 #| label: fig-ship-and-totalpr
-#| fig-cap: "Relationship Between Ship Price and Total Price"
+#| fig-cap: "Relationship Between Shipping Price and Total Auction Price"
 #| echo: false
-ggplot(data = mario_data2, aes(x = ship_pr, y = total_pr)) + 
+ggplot(data = mario_data2, aes(x = ship_pr, y = total_auction_pr)) + 
   geom_point(color='blue') +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(x = "Ship Price",
-       y = "Total Price")
+  labs(x = "Shipping Price",
+       y = "Total Auction Price")
 ```
-@fig-ship-and-totalpr is a scatter plot of the relationship between the shipping price and total price. The line of best fit shows a moderate positive relationship between the two variables. 
+@fig-ship-and-totalpr is a scatter plot of the relationship between the shipping price and total auction price. The line of best fit shows that there is no linear relationship between the two variables.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+#| label: fig-start-and-auction-pr
+#| fig-cap: "Relationship Between Total Starting Price and Total Auction Price"
+#| echo: false
+ggplot(data = price_Table, 
+       aes(x = total_start_pr, y = total_auction_pr)) + 
+  geom_point(color='blue') +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x = "Total Starting Price",
+       y = "Total Auction Price")
+```
+@fig-start-and-auction-pr is a scatter plot of the relationship between the total starting price and total auction price. The line of best fit shows a moderate positive relationship between two variables.
 
 ## Result
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# Importing dataset
-# Read the document from google spreadsheet Mario Kart
-marioKart <- read_sheet('https://docs.google.com/spreadsheets/d/1jhiTFaaJ4ZCUA9yMNFGQ2xnKItXewaNmzu6y0Syw_dk/edit?gid=1751719576#gid=1751719576')
-
-```
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# Calculate the total price based on initial starting and shipping price
-initial_total_pr <- marioKart$start_pr + marioKart$ship_pr
-
-dealing_pr <- marioKart$total_pr
-
-# Summarize the initial total price and final total price into a table
-price_Table <- data_frame(initial_total_pr, dealing_pr)
-
-```
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# Calculate the difference between initial total price and final total price and add it into the dataframe
-price_Difference <- marioKart$total_pr - initial_total_pr
-
-price_Table <- data_frame(initial_total_pr, dealing_pr, price_Difference)
-
-```
-
 ### Hypotheses
-
-Before starting hypothesis testing, we need to bring out null hypothesis and alternative hypothesis of our research question. Our null hypothesis is that there is no difference between the mean initial total price and the mean dealing price for game Mario Kart on EBay. Our alternative hypothesis is that there is a difference between the mean initial total price and the mean dealing price of Mario Kart on EBay. In symbols: $$H_0: \mu_{diff} = 0$$ $$H_A: \mu_{diff} \ne 0$$ Our goal is to use hypothesis testing to reject our null hypothesis. To investigate whether our null hypothesis is false, we need to conduct a **Paired T-Test**.
+Before starting hypothesis testing, we need to bring out null hypothesis and alternative hypothesis of our research question. Our null hypothesis is that there is no difference between the mean total starting price and the mean total auction price for game Mario Kart on EBay. Our alternative hypothesis is that there is a difference between the mean total starting price and the mean total auction price of Mario Kart on EBay. In symbols: $$H_0: \mu_{diff} = 0$$ $$H_A: \mu_{diff} \ne 0$$ Our goal is to use hypothesis testing to reject our null hypothesis. To investigate whether our null hypothesis is false, we need to conduct a **Paired T-Test**.
 
 ### Checking Conditions
 
 Before conducting the hypothesis testing, we need to check two conditions: **independence** and **normality**.
 
-Independence checks whether the data within the groups are independent. Since the `mariokart` dataset is collected, it is a simple random sample, and we can assume that each pair of the initial total price and the dealing price are independent.
+Independence checks whether the data within the groups are independent. Since the `mariokart` dataset is collected from 143 different auctions, we can assume that each pair of the initial total price and the dealing price are independent.
 
 Normality checks whether the difference of the paired data is roughly symmetric without large outliers.
 
@@ -157,21 +185,19 @@ price_Table|>
   theme_bw()
   
 ```
-
-@fig-distribution_price_difference is a boxplot representing the distribution of the price difference of game Mario Kart on EBay in 2009. Based on the boxplot above, the distribution of the difference of initial total price and dealing price are roughly normal with three outliers. There is no outlier that significantly differs from the distribution and therefore satisfies the condition.
+@fig-distribution_price_difference is a boxplot representing the distribution of the price difference of game Mario Kart on EBay in 2009. Based on the boxplot above, the distribution of the difference of total starting price and total auction price are roughly normal with three outliers. There is no outlier that significantly differs from the distribution and therefore satisfies the condition.
 
 ### Calculation
+Using t test for paired means, we will compute T-Statistics, degrees of freedom, p-value, and confidence interval with a significance level $\alpha = 0.05$. The significance level is a predetermined threshold representing how rare an incident should be so that we can reject the null hypothesis [@imstat].
 
-Using t test for paired means, we will compute T-Statistics, degrees of freedom, p-value, and confidence interval with a significance level $\alpha = 0.05$. The significance level means that
+**T statistics** stands for the ratio of how the sample mean difference varies from zero as compared to how the observations vary [@imstat]. The T test statistics obtained from formula $$T = \frac{\bar{x}_{paired}}{\sqrt{\frac{S^2_{paired}}{n}}}$$ is -27.645. The large absolute value of t test statistics means that if our null hypothesis that there is no difference between the total starting price and the total auction price for Wii Mario Kart on EBay is true, the result is relatively largely deviated from what we expect based on our null hypothesis.
 
-**T statistics** stands for the ratio of how the sample mean difference varies from zero as compared to how the observations vary. The T test statistics obtained from formula $$T = \frac{\bar{x}_{paired}}{\sqrt{\frac{S^2_{paired}}{n}}}$$ is -16.354. The large absolute value of t test statistics means that if our null hypothesis that there is no difference between the initial total price and the dealing price for Wii Mario Kart on EBay is true, the result is relatively largely deviated from what we expect based on our null hypothesis.
-
-**The degrees of freedom** is used to describe the shape of t-distribution. Its formula is $df = n -1$.In this case, the degrees of freedom is 142. The large degrees of freedom means that the t-distribution is closer to normal distribution.
+**The degrees of freedom** is used to describe the shape of t-distribution [@imstat]. Its formula is $df = n -1$.In this case, the degrees of freedom is 140. The large degrees of freedom means that the t-distribution is closer to normal distribution.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-x_bar_paired <- mean(initial_total_pr) - mean(dealing_pr)
+x_bar_paired <- mean(total_start_pr) - mean(total_auction_pr)
 s_paired <- sd(price_Difference)
-n <- 143
+n <- 141
 t_statistics <- x_bar_paired/sqrt(s_paired*s_paired/n)
 summary_table <- data_frame(n, x_bar_paired, s_paired, t_statistics)
 
@@ -179,34 +205,19 @@ summary_table <- data_frame(n, x_bar_paired, s_paired, t_statistics)
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # Calculate the degrees of freedom
-df <- 143-1
+df <- 141-1
 ```
 
-After calculating the t statistics and degrees of freedom, we can calculate **p-value**. P-value is the probability that views the alternative hypothesis for the data least agreeable if the null hypothesis is true. Since our alternative hypothesis is $H_A: \mu_{diff} \ne 0$, our p-value is two-tailed. Based on R code `t.test(initial_total_pr,dealing_pr, paired = TRUE, alternative = "two.sided")`, the p-value is to $2.2*10^{-16}$. Since our p-value is very small and approximately equals to zero, our p-value is smaller than the significance level $\alpha = 0.05$. Therefore, we reject the null hypothesis that there is no difference between the mean initial total price and the mean dealing price of game Mario Kart on EBay on 2009.
+After calculating the t statistics and degrees of freedom, we can calculate **p-value**. P-value is the probability that views the alternative hypothesis for the data least agreeable if the null hypothesis is true [@imstat]. Since our alternative hypothesis is $H_A: \mu_{diff} \ne 0$, our p-value is two-tailed. Based on R code `t.test(total_start_pr,total_auction_pr, paired = TRUE, alternative = "two.sided")`, the p-value is to $2.2*10^{-16}$. Since our p-value is very small and approximately equals to zero, our p-value is smaller than the significance level $\alpha = 0.05$. Therefore, we reject the null hypothesis that there is no difference between the mean total starting price and the mean total auction price of game Mario Kart on EBay on 2009.
 
-To find a range of the true difference between initial price and dealing price, we compute **confidence interval**. Confidence interval is a range of plausible values where we can find true population value. In this case, we are using confidence interval to calculate a range of plausible values of true difference of paired means. $A$ Based on R Code `t.test(initial_total_pr,dealing_pr, paired = TRUE, alternative = "two.sided")`, The 95% confidence interval is $(-42.49814, -33.42102)$. It means that we are 95% confident that true mean difference between initial price and dealing price is in the range $(-42.49814, -33.42102)$. 
+To find a range of the true difference between initial price and dealing price, we compute **confidence interval**. Confidence interval is a range of plausible values where we can find true population value [@imstat]. In this case, we are using confidence interval to calculate a range of plausible values of true difference of paired means. $A$ Based on R Code `t.test(total_start_pr,total_auction_pr, paired = TRUE, alternative = "two.sided")`, The 95% confidence interval is $(-38.15405, -33.06113)$. It means that we are 95% confident that true mean difference between total starting price and total auction price is in the range $(-38.15405, -33.06113)$.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-invisible(t.test(initial_total_pr,dealing_pr, paired = TRUE, alternative = "two.sided"))
-```
+invisible(t.test(total_start_pr,total_auction_pr, paired = TRUE, alternative = "two.sided"))
 
+```
 
 ## Discussion
+This study investigate whether there is a difference between the total starting price and the dealing price of game Mario Kart on EBay. Based on the result we gathered, there is a difference between the total starting price and the total auction price of game Mario Kart on EBay in 2009. The true mean difference between the total starting price and total auction price of Nintendo Wii Mario Kart lies in the range $(-38.15405, -33.06113)$. Based on our result, the total auction price of game Mario Kart is more expensive than its total starting price. There are some limitations in this study. The `mariokart` data set was collected in 2009. After decades, due to inflation and preciousness of second-hand game, the current starting price and auction price for second-hand Nintendo Wii Mario Kart might be different from what was collected in the data set. Therefore, the result of our hypothesis testing might not match the distribution of price difference of the current second-hand price for Wii Mario kart and hence might not provide useful suggestions for people to decide whether they should buy the second-hand game or not. Moreover, this data set is not representative to the population - the price of all Nintendo Wii Mario Kart on EBay. The data set used took all the auctions of Mario Cart games that happened during one week in October 2009. This sample is not representative because it only contains all auction for a week on October on EBay in 2009. If the data are collected at a another time, the price distribution might be different because on holidays or at the end of the season, there might be discounts that potentially affect the dealing price of the game. Further direction for this project is to collect more data of Nintendo Wii Mario Kart on EBay. For example, we can collect data from a week in every month so that we would have a better comparison of price difference at different period of time. Then, we can compare which month has the lowest price difference, which month has the highest price difference, and what are the potential influential factors of high or low price difference. With more updated larger sample data, we will be able to provide people with more up-to-date information and analysis before their purchase.
 
-This study investigate whether there is a difference between the initial price and the dealing price of game Mario Kart on EBay. Based on the result we gathered, there is a difference between the initial total proce and the dealing price of game Mario Kart on EBay in 2009. The true mean difference between the initial total price and dealing price of Nintendo Wii Mario Kart lies in the range $(-42.49814, -33.42102)$. Based on our result, the dealing price of game Mario Kart is more expensive than its initial total price.  
-There are some limitations in this study. 
-1. We cannot use the data from 2009 to match what is the current second-hand price for Wii Mario kart.
-2. This data is not a simple random sample. The data set used took all the auctions of Mario Cart games that happened during one week in October 2009. This sample is not representative. Different time (discount seasons might make a difference for the dealing price/auction price).
-If we want to investigate more
-1. Gather new data of current second-hand Nintendo Wii Mario Kart price with larger sample size. 
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# Grading Rubric for discussion
-
-# A summary of your overall findings are explained in a clear and straightforward manner such that a person without statistical training or domain expertise can understand them.
-# Results are tied back to the research question.
-# Limitations of the analysis/data are acknowledged.
-# It is explained/assessed if the sample is representative of your population of interest. (Hint: Most samples have some limitations. It is okay to have a sample that is not perfect, but you must be able to identify why the sample may not represent the population.)
-# Discussion of future directions or extensions to this project you want to consider.
-
-```
+## Bibliography
